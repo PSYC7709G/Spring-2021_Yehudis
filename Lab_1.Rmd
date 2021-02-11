@@ -1,0 +1,75 @@
+---
+title: "Lab_1"
+author: "Yehudis"
+date: "2/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problems
+
+- Important: This lab has one coding problem, and one written problem. Both are worth 3 points. The written problem must be completed before next class. No points will be awarded for late assignments. It is critical that you complete the written portion because it is necessary for your participation next week.
+
+Written Problem
+
+- 3 points
+
+- We will go over this in-class too. In chapter 5 on regression, Abdi discusses a primary research article from 1960 by Slamecka (1960) as an example. A pdf of this article is located in the shared zotero library.
+
+Your writing assignment is as follows:
+
+- Read the paper (it is only 5 pages)
+
+- Write a point-form QALMRI summary of the paper.
+
+- I will explain in-class what a QALMRI summary is, but you can also read the general instructions here: https://crumplab.github.io/ResearchMethodsLab/qalmri.html
+
+- Submit your QALMRI assignment on Blackboard
+NOTE: next class we will discuss your QALMRI in groups, then as a bigger group, to make sure we understand the design.
+
+Retroactive Inhibition of Connected Discourse as a Function of Practice Level
+
+Question
+
+- Broad: Do varying degrees of practice have the same effect upon the recall of connected discourse as they do on unconnected materials? 
+
+- Specific: Is the rote retention of a passage of prose subject to retroactive inhibition, and is its recall a direct function of amount of practice in original learning, and an inverse function of amount of practice in interpolated learning?
+
+Alternative
+
+- The rote retention of a passage of prose is NOT subject to retroactive inhibition, and its recall is NOT a direct function of amount of practice in original learning, and NOT an inverse function of amount of practice in interpolated learning.
+
+Logic
+
+- If the rote retention of a passage of prose is subject to RI, then when OL and IL levels are manipulated, the subjects’ retention of prose should vary accordingly, as it does with unconnected materials.
+
+Method
+
+- Subjects: 36 university psychology students did 4 40-minute sessions (first was practice). Session followed the RI paradigm, with OL, IL, and relearning of OL passage by serial anticipation method. 
+
+- Materials: 8 20-word sentences, each word exposed on memory drum for 3 seconds. Length of each trial was 60 seconds, followed by a 6-second intertrial interval. The passages were in 4 pairs, of which the first was OL and second IL, one pair for each session. 
+
+- Independent: The mixed-factorial design determined that each of the three sessions that each participant did had a different OL and IL degree of practice (9 pair possibilities), including both in-between and within-subject factors. Distraction activity in lapse time controlled for practice time. 
+
+- Dependent: Retention outcome for IL and OL learning prompts.
+
+Results
+
+- Increase of OL trials, at each level of IL, led to meaningful increase of mean correct anticipations. Means per each IL level were different from adjacent means. Increase of IL practice increased the degree of acquisition. The authors conclude that rote retention of connected discourse is subject to significant RI, and it varies in direct connection with degree of OL practice, inversely with level of IL practice. This supports prior literature and can be validly generalized. 
+
+Inferences
+
+- Because OL/IL acquisition is an outcome of practice, prose recall leads to significant RI, and recall varies with OL practice direction and IL practice inversely, findings related to degree of learning and RI based on unconnected materials can be generalized to connected discourse. 
+
+Coding problem
+
+- 3 points
+
+- Create a dataframe that capable of representing the design, in as complete a way as you can, in the Slamecka (1960) paper.
+
+References
+
+- Slamecka, N. J. (1960). Retroactive inhibition of connected discourse as a function of practice level. Journal of Experimental Psychology, 59(2), 104–108. https://doi.org/b5z2nt
