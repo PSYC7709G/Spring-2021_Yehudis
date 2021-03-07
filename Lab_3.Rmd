@@ -1,0 +1,64 @@
+---
+title: "Lab_3"
+author: "Yehudis"
+date: "2/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+-   The problem for this week is to develop a little bit of content (tutorial material) that could be added to this lab. (6 points)
+
+-   The purpose of this lab is for you to try and create something that could in principle be added to the content of this lab. For example, maybe you think there is another way to explain semi-partial correlation, or the concept of orthogonality, or you would like to provide a different example computing semi-partial correlation.
+
+-   This is a fairly open lab assignment. Your task is to develop a little tutorial or example that could be inserted into this lab. I’m not going to give guidelines on how long this should be. It probably shouldn’t be as long as an entire lab, and it probably shouldn’t be as short as 1 line of code and one sentence. I’m thinking a paragraph or two of explanation, and a code snippet or two to illustrate your example. Imagine you are trying to explain these concepts or practical tips, and see what you come up with.
+
+-   When you submit your assignment please let me know if you are OK with me putting your example up on this course website for this lab. It is totally OK if you do not want to do this. If you are OK with this, then I will add a new section to this lab called “Student contributed examples”; and, you will be recognized as a contributing author to this lab. Note also, that I am sharing this lab on a creative commons license (CC BY SA 4.0), which basically means that other people can copy, edit, and re-use this material as they wish, but they do have to credit the content creators if they do this. If you choose to have your example displayed, then your content will also be on this license. We can discuss the license in more detail next week if you have questions.
+
+## How to run an ANOVA with a Tukey post-hoc test
+
+# This is a one-way Anova because we only are examining one independent variable.
+
+# Import data as .csv file. 
+
+# Summarize to make sure it looks right. You will only get min/max/mean/quarter for each variable.
+
+# Run a simple anova set up as (dependent ~ independent) in that order. I named it "aov1" because it is a one way.
+
+# Put the test into a vector so that you can use it to summarize your full data easily. You will get SS, df, F, P., etc.
+
+# TukeyHSD() is the function for a post-hoc test according to the Tukey principles, which is the most commonly acccepted measure of post-hoc analyses for Anova currently. Keep in mind it is conservative so it may wipe out significance that you can find in lenient post-hoc alternatives. Only run the TukeyHSD if there is significance of any sort in the initial Anova.
+
+# If you have a second independent variable to measure, you can run a 2-way Anova. 
+
+# Repeat process as for aov1 but enjoy (possibly) more interesting results.
+
+# You can then print the data you need for your APA statement.
+
+# My sample: I created it in tangent to the research proposal I am concurrently writing for Dr. Gao's Research Methods class. The study: Sampling from women 18+ of (a minimum of) 3 ultra-Orthodox sects--this would be the first independent variable for a 1 or 2-way Anova. Note Jewish ethnic source too (primarily the two given groups)--this would be the second independent variable for a 2-way Anova. They are assessed on Eating Disorders (EDs) and given a score ranging 0-10 (higher score = worse ED). The Anova will help us determine if individual sect and ethnicity is related to ED score. The post-hoc test will tell us if there are any between group differences (in aov1 we will see just between sect and score, in aov 2 we will look at that, as well as ethnicity and score, and sect+ethnicity and score).
+
+```{r}
+anovadata=read.csv(file = 'anovadata.csv')
+
+summary(anovadata)
+aov1 <- aov(score ~ sect, data = anovadata)
+summary(aov1)
+model.tables(aov1, "means")
+
+TukeyHSD(aov1)
+
+aov2 <- aov(score ~ sect + ethnicity + sect:ethnicity, data = anovadata)
+summary(aov2)
+model.tables(aov2, "means")
+
+TukeyHSD(aov2)
+
+library(papaja)
+
+apa_print(aov2)
+
+apa_table(apa_print(aov2)$table)
+```
+
