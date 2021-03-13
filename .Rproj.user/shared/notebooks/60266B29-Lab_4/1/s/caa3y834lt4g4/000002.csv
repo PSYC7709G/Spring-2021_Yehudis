@@ -1,0 +1,3 @@
+"0","library(tibble)"
+"0","example_data <- tibble(Group = rep(c(""A"",""B""), each = 5),"
+"0","                       DV = c(2,4,3,5,4,7,6,5,6,7))"

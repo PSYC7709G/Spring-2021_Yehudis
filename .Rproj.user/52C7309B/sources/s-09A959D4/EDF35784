@@ -1,0 +1,32 @@
+{
+    "id": "EDF35784",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1615565741317.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "expression": "descriptive_df",
+        "caption": "descriptive_df",
+        "totalObservations": 4,
+        "displayedObservations": 4,
+        "variables": 3,
+        "cacheKey": "CFA12188",
+        "object": "descriptive_df",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=descriptive_df&cache_key=CFA12188&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1430006529445120429,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1615565741317,
+    "read_only": false,
+    "read_only_alternatives": []
+}

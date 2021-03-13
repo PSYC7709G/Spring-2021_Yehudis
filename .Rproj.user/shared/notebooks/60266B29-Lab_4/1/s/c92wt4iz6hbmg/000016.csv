@@ -1,0 +1,4 @@
+"0","summary(aov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data))$full_results$Condition
+"
+"1","NULL
+"

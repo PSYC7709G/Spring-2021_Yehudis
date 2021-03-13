@@ -1,0 +1,93 @@
+---
+title: "Lab_4"
+author: "Yehudis"
+date: "3/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Consider the following example data for a between-subjects experiment with two groups, A and B:
+
+```{r}
+library(tibble)
+example_data <- tibble(Group = rep(c("A","B"), each = 5),
+                       DV = c(2,4,3,5,4,7,6,5,6,7))
+```
+
+Use R to conduct a t.test and ANOVA on this data. Then use R to prove that the results of both analyses are the same. For example, prove that the p-values are the same, and prove that the F-value and T-value are related. (3 points)
+
+```{r}
+#t-test
+t_test <- t.test(DV~Group, var.equal=TRUE, data=example_data)
+
+#anova
+anova_test <- summary(aov(DV~Group, data=example_data))
+
+#p value comparison
+t_test$p.value
+anova_test[[1]]$`Pr(>F)`[1]
+t_test$p.value==anova_test[[1]]$`Pr(>F)`[1]
+
+round(t_test$p.value, digits=5)==round(anova_test[[1]]$`Pr(>F)`[1], digits=5)
+
+#=F + T relationship
+t_test$statistic^2
+anova_test[[1]]$`F value`[1]
+
+round(t_test$statistic^2, digits=1)==round(anova_test[[1]]$`F value`[1], digits=1)
+```
+
+2. Look at the lab on ANOVA that I wrote for our undergraduate statistics OER lab manual https://crumplab.github.io/statisticsLab/lab-8-one-way-anova.html. That lab shows an example of obtaining data from a published paper in psych science where a one-factor ANOVA was used as a part of the analysis. Load the data, conduct the ANOVA, report a ggplot of the means, and use papaja to help you write a short results section reporting the ANOVA result. (3 points).
+
+```{r}
+library(data.table)
+#fread("https://raw.githubusercontent.com/CrumpLab/statisticsLab/master/data/Jamesetal2015Experiment2.csv")
+all_data <- fread("Jamesetal2015Experiment2.csv")
+
+view(all_data)
+
+all_data$Condition <- as.factor(all_data$Condition)
+levels(all_data$Condition) <- c("Control",
+                                "Reactivation+Tetris", 
+                                "Tetris_only",
+                                "Reactivation_only")
+
+library(dplyr)
+
+library(ggplot2)
+
+# get means and SEs
+descriptive_df <- all_data %>% 
+                    group_by(Condition) %>% 
+                    summarise(means= mean(Days_One_to_Seven_Number_of_Intrusions),
+                              SEs = sd(Days_One_to_Seven_Number_of_Intrusions)/sqrt(length(Days_One_to_Seven_Number_of_Intrusions)))
+
+# Make the plot
+ggplot(descriptive_df, aes(x=Condition, y=means))+ 
+  geom_bar(stat="identity", aes(fill=Condition))+ # add means
+  geom_errorbar(aes(ymin=means-SEs,               # add error bars
+                    ymax=means+SEs), width=.1) +
+  geom_point(data=all_data, aes(x=Condition, y=Days_One_to_Seven_Number_of_Intrusions), alpha=.5)+
+  geom_point(alpha=.25)+
+  ylab("Intrusive Memories (Mean for Week)")
+
+#ANOVA
+aov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data)
+summary(aov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data))
+anova_test2 <- summary(aov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data))
+summary(anova_test2)
+
+#Report in APA style
+library(papaja)
+apa_printaov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data)
+summary(aov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data))$full_results$Condition
+```
+
+We submitted the mean intrusive memories for the week from each subject in each condition to a one-factor between-subjects ANOVA, with Intervention type (No-task control, Reactivation Plus tetris, Tetris only, Reactivation only) as the sole independent variable. We found a main effect of Intervention type, `r apa_printaov(
+summary(aov(Days_One_to_Seven_Number_of_Intrusions ~ Condition, all_data))$full_results$Condition`.
+
+Abdi, H., Edelman, B., Dowling, W. J., & Valentin, D. (2009). Experimental design and analysis for psychology. Oxford University Press.
+Crump, M. J. C., Navarro, D., & Suzuki, J. (2018). Answering questions with data: Introductory Statistics For Psychology Students. https://crumplab.github.io/statistics/
