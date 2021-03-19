@@ -1,0 +1,5 @@
+"0",""
+"0","my_pvalues <- replicate(10000,t.test(rnorm(20,0.5,1),rnorm(20,0,1), var.equal = TRUE)$p.value)"
+"0",""
+"0","hist(my_pvalues)"
+"0",""
