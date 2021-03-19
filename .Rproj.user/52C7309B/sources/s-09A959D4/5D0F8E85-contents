@@ -111,7 +111,7 @@ save_F_values <- length(1000)
 for(i in 1:1000){
 random_data <- tibble(subjects = 1:(levels*n_per_level),
                       IV = as.factor(rep(1:levels, each = n_per_level)),
-                      DV = rnorm(levels*n_per_level, 0, 1)
+                      DV = rnorm(levels*n_per_level, 1)
                       )
 aov.out <- aov(DV ~ IV, data = random_data)
 simulated_F <- summary(aov.out)[[1]]$`F value`[1]
@@ -120,7 +120,7 @@ save_F_values[i] <- simulated_F
 
 library(ggplot2)
 
-F_comparison <- tibble(type = rep(c("analytic","simulated"), each = 1000),
+F_comparison <- tibble(type = rep(c("analytic","simulated_t1"), each = 1000),
   F_value=c(rf(1000,levels-1,(levels*n_per_level)-levels),save_F_values))
 
 ggplot(F_comparison, aes(x=F_value, color=type))+
