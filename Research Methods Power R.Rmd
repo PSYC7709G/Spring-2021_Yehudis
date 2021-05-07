@@ -1,0 +1,20 @@
+---
+title: "Research Methods Power R"
+author: "Yehudis"
+date: "5/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+install.packages("pwr")
+library(pwr)
+pwr.r.test(n=30,
+           r=.5,
+           sig.level=.05,
+           alternative="two.sided")
+```
