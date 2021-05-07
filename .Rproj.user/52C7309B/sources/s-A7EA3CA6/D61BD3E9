@@ -1,0 +1,32 @@
+{
+    "id": "D61BD3E9",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1620413517537.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "expression": "godden_baddeley",
+        "caption": "godden_baddeley",
+        "totalObservations": 20,
+        "displayedObservations": 20,
+        "variables": 4,
+        "cacheKey": "A8873DDF",
+        "object": "godden_baddeley",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=godden_baddeley&cache_key=A8873DDF&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 4588435917389988451,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1620413517537,
+    "read_only": false,
+    "read_only_alternatives": []
+}
