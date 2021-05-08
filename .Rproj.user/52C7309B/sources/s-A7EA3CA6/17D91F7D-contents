@@ -170,7 +170,35 @@ Testing_sea <- testing_place_means %>%
   filter(TestingPlace == "Under Sea") %>%
   select(mean_recall)
 
-t.test(Testing_land$mean_recall - Testing_sea$mean_recall)
+t.test(Testing_land$mean_recall - Testing_sea$mean_recall, mu = 0)
+
+#interaction
+
+LL <- godden_baddeley %>%
+  filter(LearningPlace == "On Land",
+         TestingPlace == "On Land") %>%
+pull(Recall)
+
+LS <- godden_baddeley %>%
+  filter(LearningPlace == "On Land",
+         TestingPlace == "Under Sea") %>%
+pull(Recall)
+
+SL <- godden_baddeley %>%
+  filter(LearningPlace == "Under Sea",
+         TestingPlace == "On Land") %>%
+pull(Recall)
+
+SS <- godden_baddeley %>%
+  filter(LearningPlace == "Under Sea",
+         TestingPlace == "Under Sea") %>%
+pull(Recall)
+
+LL - LS
+
+SL - SS
+
+t.test((LL - LS) - (SL - SS), mu = 0)
 
 ```
 
@@ -191,7 +219,75 @@ sphericity <- tribble(~S, ~a1, ~a2, ~a3, ~a4,
 
 4. Create a line plot showing how each of the 5 subjects perform across the levels of the IV. Discuss how the line plot visually shows the sphericity problem in the data (1 point)
 
+```{r}
+library(tidyr)
+library(tibble)
+sphericity <- pivot_longer(sphericity,
+                           cols = !S,
+                           names_to = "IV",
+                           values_to = "DV")
+
+ggplot(sphericity, aes(x=IV, y=DV, color=S, group = S))+
+  geom_point()+
+  geom_line()
+```
+
 5. Modify the above data to remove the sphericity problem. Specifically, ensure that all subjects are different from another (there overall means are different), and that the IV has the same effect for each level and each subject (no interaction). Then, plot the new data and discuss how the graph shows the sphericity problem has been removed. (1 point)
+
+```{r}
+
+sphericity <- tribble(~S, ~a1, ~a2, ~a3, ~a4,
+        "s1",76,64,34,26,
+        "s2",60,48,18,10,
+        "s3",58,46,16,8,
+        "s4",46,34,4,-4,
+        "s5",30,18,-12,-20
+        )
+
+sphericity <- pivot_longer(sphericity,
+                           cols = !S,
+                           names_to = "IV",
+                           values_to = "DV")
+
+ggplot(sphericity, aes(x=IV, y=DV, color=S, group = S))+
+  geom_point()+
+  geom_line()
+
+```
 
 6. Calculate the Greenhouse-Geisser estimate of epsilon for your modified data to demonstrate you have removed the sphericity problem. (1 point)
 
+```{r}
+sphericity <- tribble(~S, ~a1, ~a2, ~a3, ~a4,
+        "s1",76,64,34,26,
+        "s2",60,48,18,10,
+        "s3",58,46,16,8,
+        "s4",46,34,4,-4,
+        "s5",30,18,-12,-20
+        )
+
+textbook <- sphericity
+
+## selecting the table of values in each column
+textbook[,2:5]
+
+## computing the covariation matrix
+cov(textbook[,2:5])
+
+## ta
+colMeans(cov(textbook[,2:5]))
+
+## sa-s
+colMeans(cov(textbook[,2:5])) - mean(cov(textbook[,2:5]))
+
+## double-centering
+
+cov_matrix <- cov(textbook[,2:5])
+col_mean_matrix <- cov_matrix*0 + colMeans(cov_matrix)
+row_mean_matrix <- t(cov_matrix*0 + rowMeans(cov_matrix))
+dc_matrix <- cov_matrix - col_mean_matrix -row_mean_matrix + mean(cov_matrix)
+
+## greenhouse-geisser
+sum(diag(dc_matrix))^2 / ((dim(dc_matrix)[1]-1)*sum(dc_matrix^2))
+
+```
