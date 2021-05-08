@@ -417,7 +417,9 @@ summary {
 </div>
 
 
-<p>Chapter 20</p>
+<ol style="list-style-type: decimal">
+<li>From Chapter 20, reproduce the bat and hat example (20.2) in R. Your code should represent the data in long-form, conduct the ANOVA, and report the ANOVA table. You will know if you did it correctly if you can reproduce the ANOVA table from the textbook. (3 points)</li>
+</ol>
 <pre class="r"><code>#tribble
 library(tibble)
 bat_hat_data &lt;- tribble(~Subject, ~Phonological_Similarity, ~Age, ~num_correct,
@@ -474,7 +476,9 @@ bat_hat_data &lt;- tibble(subjects,
                        Phonological_Similarity,
                        Age,
                        num_correct)</code></pre>
-<p>Chapter 21</p>
+<ol start="2" style="list-style-type: decimal">
+<li>From Chapter 21, reproduce the phonological similarity example (21.2.1) in R. Your code should represent the data in long-form, conduct the ANOVA, and report the ANOVA table. You will know if you did it correctly if you can reproduce the ANOVA table from the textbook. (3 points) Note, the F-value for the phonological similarity factor that you find with R may not be the same as the textbook. The textbook produces the quasi-F, and it is OK if you do not.</li>
+</ol>
 <pre class="r"><code>Subject &lt;- rep(c(&quot;s1&quot;,&quot;s2&quot;,&quot;s3&quot;,&quot;s4&quot;),each=10)
 Typicality_B &lt;-rep(rep(c(&quot;b1&quot;,&quot;b2&quot;),each=5),4)
 Faces_A &lt;- rep(c(&quot;a1&quot;,&quot;a2&quot;,&quot;a3&quot;,&quot;a4&quot;,&quot;a5&quot;),8)
