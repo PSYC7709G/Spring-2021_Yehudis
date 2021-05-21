@@ -1,0 +1,11 @@
+"0","#import a file & rename simultaneously"
+"0","library(readr)"
+"0","master_data <- read_csv(""OG Data Set SLP.csv"")"
+"2","Parsed with column specification:
+cols(
+  .default = col_double(),
+  PP1 = [31mcol_character()[39m
+)
+"
+"2","See spec(...) for full column specifications.
+"

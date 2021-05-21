@@ -1,0 +1,580 @@
+---
+title: "Data to Remember"
+author: "Yehudis"
+date: "05/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = "figures/", dev = c("pdf", "png"))
+```
+
+Between 2016 and 2018, we have collected data from 1,206 clients who utilized the counseling center at an urban college in a larger university system, for at least one session. We recorded demographic information as provided by the SDS, the number of sessions attended, and their pathology levels on a clinical intake form (the CCAPS-62). 
+
+The study analyzed pre-existing clinical data related to the following questions:
+
+1.	What is the mean number of sessions attended? Does this metric vary by racial or ethnic identity?
+
+2.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
+
+3.	Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? Is there a disparity between the 8 CCAPS subscale scores among the different racial and/or ethnolinguistic communities?
+
+- Before uploading our original data set to R, we removed the data from 26 clients who did not complete the CCAPS-62 questionnaire. This left us with a starting point of 1,180 clients (originally 1,206).
+
+- First, we import and rename our data set. Prior to uploading, we converted our file from a .xlsx (Excel) to a .csv (comma separated values) format, for convenience of using in R. 
+
+```{r}
+# Import data file & rename simultaneously
+
+library(readr)
+master_data <- read_csv("OG Data Set SLP.csv")
+```
+
+Next, we decoded categorical variables that are indicated by numbers in our source code book. While in a software package like SPSS, there is a code book for variable classification, in R we need to indicate what each non-numerical variable is in our global environment. This is most simply done by vectors.
+
+The primary categorical variables that need decoding are ethnicity, gender, and PP (Presenting Problems). The order we type them in corresponds directly to 1, 2, etc.
+
+```{r}
+# Decode numerical string variables
+## Create a decoder dictionary
+
+ethnicity_code <- c("African American/Black","Anglo American/White","Asian American/Pacific Islander","Hispanic American/Latino","Native American","More than 1 Ethnicity","No Response")
+
+gender_code <- c("Missing/Unknown","Male","Female","Other")
+
+PP_code <- c("Academic workload",
+"Adjusting to university",
+"Alcohol/drugs",
+"Anxiety, fears, nervousness",
+"Assertiveness",
+"Binging/vomiting",
+"Breakup/loss of a relationship",
+"Concentration",
+"Confusion in beliefs, values",
+"Dating concerns",
+"Bereavement, general",
+"Decisions career/major",
+"Depression",
+"Developing independence from family",
+"Finances",
+"Homesick",
+"Irritability/anger",
+"Making friends",
+"Perfectionism",
+"Physical health problems",
+"Procrastination",
+"Problem pregnancy",
+"Rape",
+"Relationship with family",
+"Relationship with peers",
+"Relationship with romantic partner",
+"Religious, spritual concerns",
+"Self-esteem",
+"Sexual concerns",
+"Sexual identity",
+"Sexual orientation",
+"Sexually transmitted disease",
+"Shyness/ill at ease/isolating (social anxiety)",
+"Sleeping problems",
+"Starvation, fasting",
+"Stress management",
+"Study skills problems",
+"Suicidal feelings",
+"Test/speech performance anxiety",
+"Time management",
+"Uncertain about future",
+"Weight body image",
+"Feeling overwhelmed by a number of things",
+"Illness in the family",
+"Immigration concerns",
+"Self-cutting",
+"PTSD",
+"General lack of motivation, interest in life",
+"Generally unhappy or dissatisfied",
+"Violent thoughts, feelings, or behaviors",
+"Fear of loss of contact with reality",
+"Homelessness",
+"Bipolar",
+"Growing sense of detachment and hopelessness",
+"Concerns related to being a member of a minority",
+"Emotions out of control, mood swings",
+"Intimate partner violence, physical",
+"ADHD",
+"OCD",
+"Loneliness",
+"Sextortion",
+"Interpersonal Personnel Violence - Sexual",
+"Parenting",
+"Moving/relocating",
+"Adjustment to U.S. - International",
+"Concern over arrest/legal",
+"Acculturation discrimination",
+"Crime victim of violence",
+"Schizophrenia",
+"Excoriation/dermatillomania",
+"Disciplinary",
+"Asperger spectrum")
+```
+
+We now have to match the decoded variables to their appropriate columns.
+
+We are unsure why - but ethnicity and gender were decoded by the string variables directly in their original cells, while PP_1 was decoded in a new column and the original kept intact. While this does not affect our analysis, we can just keep in mind to use the title of the new column in any graphs or analyses.
+
+```{r}
+# Assign a decoded column
+
+master_data$ethnicity <- factor(master_data$ethnicity, 1:7, ethnicity_code)
+
+master_data$gender <- factor(master_data$gender, 1:4, gender_code)
+
+master_data$PP_1 <- factor(master_data$PP1, 1:72, PP_code)
+```
+
+Previously, we decoded the variables within a column. Now, we are decoding the actual title of the columns pertaining to the CCAPS-62 items. Note that the CCAPS-62 is graded on a 5-point Likert scale (0-4 in terms of severity) and is therefore a numerical variable.
+
+```{r}
+# Decode title of column
+
+CCAPS_44 =	"I feel uncomfortable around people I don't know"
+CCAPS_45 =	"I feel irritable"
+CCAPS_46 = "I have thoughts of ending my life"
+CCAPS_47 = "I feel self conscious around others"
+CCAPS_48	= "I purge to control my weight"
+CCAPS_49	= "I drink more than I should"
+CCAPS_50	= "I enjoy getting drunk"
+CCAPS_51 =	"I am not able to concentrate as well as usual"
+CCAPS_52	= "I am afraid I may lose control and act violently"
+CCAPS_53	= "It's hard to stay motivated for my classes"
+CCAPS_29	= "When I drink alcohol I can't remember what happened"
+CCAPS_30	= "I feel tense"
+CCAPS_31	= "When I start eating I can’t stop"
+CCAPS_32	= "I have difficulty controlling my temper"
+CCAPS_1	= "I get sad or angry when I think of my family"
+CCAPS_33	= "I am easily frightened or startled"
+CCAPS_34	= "I diet frequently" 
+CCAPS_35	= "I make friends easily"
+CCAPS_36	= "I sometimes feel like breaking or smashing things"
+CCAPS_37	= "I have unwanted thoughts I can't control"
+CCAPS_38	= "There's a history of abuse in my family"
+CCAPS_39	= "I experience nightmares or flashbacks"
+CCAPS_40	= "I feel sad all the time"
+CCAPS_41	= "I am concerned that other people do not like me"
+CCAPS_42	= "I wish my family got along better"
+CCAPS_43	= "I get angry easily"
+CCAPS_2	= "I am shy around others"
+CCAPS_3	= "There are many things I am afraid of"
+CCAPS_4	= "My heart races for no good reason"
+CCAPS_5	= "I feel out of control when I eat"
+CCAPS_6	= "I enjoy my classes"
+CCAPS_7	= "I feel that my family loves me"
+CCAPS_8	= "I feel disconnected from myself"
+CCAPS_9	= "I don't enjoy being around people as much as I used to"
+CCAPS_10	= "I feel isolated and alone"
+CCAPS_11	= "My family gets on my nerves"
+CCAPS_12	= "I lose touch with reality"
+CCAPS_13	= "I think about food more than I would like to"
+CCAPS_14	= "I am anxious that I might have a panic attack while in public"
+CCAPS_15	= "I feel confident that I can succeed academically"
+CCAPS_16	= "I become anxious when I have to speak in front of audiences"
+CCAPS_17	= "I have sleep difficulties"
+CCAPS_18	= "My thoughts are racing"
+CCAPS_19	= "I am satisfied with my body shape"
+CCAPS_20	= "I feel worthless"
+CCAPS_21	= "My family is basically a happy one"
+CCAPS_22	= "I am dissatisfied with my weight"
+CCAPS_23	= "I feel helpless"
+CCAPS_24	= "I use drugs more than I should"
+CCAPS_25	= "I eat too much"
+CCAPS_26	= "I drink alcohol frequently"
+CCAPS_27	= "I have spells of terror or panic"
+CCAPS_28	= "I am enthusiastic about life"
+CCAPS_54	= "I feel comfortable around other people"
+CCAPS_55	= "I like myself"
+CCAPS_56	= "I have done something I have regretted because of drinking"
+CCAPS_57	= "I frequently get into arguments"
+CCAPS_58	= "I find that I cry frequently"
+CCAPS_59	= "I am unable to keep up with my schoolwork"
+CCAPS_60	= "I have thoughts of hurting others"
+CCAPS_61	= "The less I eat, the better I feel about myself"
+CCAPS_62	= "I feel that I have no one who understands me"
+```
+
+We need to reverse the score in some of the CCAPS-62 items. The items we are reversing are positive items whereas the majority of items are scored negatively.
+
+Example of positive item that needs to be reverse-scored: "I make friends easily".
+
+Example of negative item that will retain original value: "I feel that I have no one who understands me".
+
+```{r}
+# Reverse score in original column
+
+master_data[,c("CCAPS_06","CCAPS_07","CCAPS_15","CCAPS_19","CCAPS_21","CCAPS_28","CCAPS_35","CCAPS_54","CCAPS_55")] <- 4-master_data[,c("CCAPS_06","CCAPS_07","CCAPS_15","CCAPS_19","CCAPS_21","CCAPS_28","CCAPS_35","CCAPS_54","CCAPS_55")]
+```
+
+The sum of the CCAPS-62 values (62 items) totals to a CCAPS score per participant. This will create a new column with the score per participant, as it's a new variable that didn't exist prior.
+
+```{r}
+# Add CCAPS score
+
+#44:62 is first to last CCAPS value (range) based on the order that the items were input, as they were not entered in ascending order.
+#grep tells me the column number from the name
+#row sums adds them up
+#"na.rm = TRUE" ignores NA values
+
+master_data$CCAPS_score <- rowSums(master_data[grep("CCAPS_44", colnames(master_data)):grep("CCAPS_62", colnames(master_data))],na.rm = TRUE)
+```
+
+The CCAPS-62 is a total pathology score, but is comprised of 8 sub-scales: depression, generalized anxiety, social anxiety, academic distress, eating concerns, family distress, hostility, and substance use. The scores on each sub-scale indicates level of severity in that area for each participant. Clinicians use those scores to see if a client is having particular struggles in an area, and would then address it appropriately in a session. We will get these sub-scores by summing the items that comprise each category.
+
+```{r}
+#CCAPS-62 sub-scales
+
+master_data$depression_subscale <- rowSums(master_data[,c(
+  "CCAPS_08",
+  "CCAPS_09",
+  "CCAPS_10",
+  "CCAPS_12",
+  "CCAPS_20",
+  "CCAPS_23",
+  "CCAPS_28",
+  "CCAPS_37",
+  "CCAPS_40",
+  "CCAPS_46",
+  "CCAPS_55",
+  "CCAPS_58",
+  "CCAPS_62"
+)])
+
+master_data$generalized_anxiety_subscale <- rowSums(master_data[,c(
+  "CCAPS_03",
+  "CCAPS_04",
+  "CCAPS_14",
+  "CCAPS_17",
+  "CCAPS_18",
+  "CCAPS_27",
+  "CCAPS_30",
+  "CCAPS_33",
+  "CCAPS_39"
+)])
+
+master_data$social_anxiety_subscale <- rowSums(master_data[,c(
+  "CCAPS_02",
+  "CCAPS_16",
+  "CCAPS_35",
+  "CCAPS_41",
+  "CCAPS_44",
+  "CCAPS_47",
+  "CCAPS_54"
+)])
+
+master_data$academic_distress_subscale <- rowSums(master_data[,c(
+  "CCAPS_06",
+  "CCAPS_15",
+  "CCAPS_51",
+  "CCAPS_53",
+  "CCAPS_59"
+)])
+
+master_data$eating_concerns_subscale <- rowSums(master_data[,c(
+  "CCAPS_05",
+  "CCAPS_13",
+  "CCAPS_19",
+  "CCAPS_22",
+  "CCAPS_25",
+  "CCAPS_31",
+  "CCAPS_34",
+  "CCAPS_48",
+  "CCAPS_61"
+)])
+
+master_data$family_distress_subscale <- rowSums(master_data[,c(
+  "CCAPS_01",
+  "CCAPS_07",
+  "CCAPS_11",
+  "CCAPS_21",
+  "CCAPS_38",
+  "CCAPS_42"
+)])
+
+master_data$hostility_subscale <- rowSums(master_data[,c(
+  "CCAPS_32",
+  "CCAPS_36",
+  "CCAPS_43",
+  "CCAPS_45",
+  "CCAPS_52",
+  "CCAPS_57",
+  "CCAPS_60"
+)])
+
+master_data$substance_use_subscale <- rowSums(master_data[,c(
+  "CCAPS_24",
+  "CCAPS_26",
+  "CCAPS_29",
+  "CCAPS_49",
+  "CCAPS_50",
+  "CCAPS_56"
+)])
+```
+
+We need to clean our data by removing participants who cannot meaningfully contribute to our analyses. Because our hypotheses are looking at ethnicity, and we cannot come to a statistical conclusion with a sample size of 1 Native American participant, we must remove them from our data. Many participants did not identify their racial/ethnolinguistic identity. Because we are comparing specific racial and ethnolinguistic identities to our CCAPS scores, we must remove unidentified participants from our data set.
+
+```{r}
+#delete entire rows by irrelevant ethnicities (no response & native american)
+
+master_data <- master_data[master_data$ethnicity != "No Response",]
+
+master_data <- master_data[master_data$ethnicity != "Native American",]
+
+# We reform the ethnicity factor to account for the removed subjects.
+
+master_data$ethnicity <- factor(master_data$ethnicity)
+```
+
+We are left with 809 participants.
+
+Now that we have cleaned our data, it's ready to be analyzed!
+
+We will go through our questions (hypotheses; relaxed language used considering we are analyzing pre-existing datas) one by one.
+
+1.	What is the mean number of sessions attended? 
+
+- Does this metric vary by racial or ethnic identity?
+
+- Report # of sessions but use different bars to represent REI
+
+3.	Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? Is there a disparity between the 8 CCAPS subscale scores among the different racial and/or ethnolinguistic communities?
+
+```{r}
+
+# Distribution histogram - Counseling center session attendance (not sorted by REI)
+
+hist(master_data$sessioncount,
+main="session count by REI",
+xlab="Frequency of Session Count for All Students",
+xlim=c(1,70),
+col="darkmagenta",
+)
+
+mean(master_data$sessioncount)
+
+# Total sum of sessions by each REI
+
+aggregate (master_data$sessioncount, by=list(master_data$ethnicity),FUN=sum)
+
+# Frequency table - sessions by REI
+
+library(tidyverse)
+library(dplyr)
+
+SessionCountxREI <- master_data %>%
+  group_by(sessioncount, ethnicity) %>%
+  summarize(Number_of_Students=length(clientid))
+
+# Distribution histogram - counseling center session attendance sorted by REI
+
+library(ggplot2)
+
+ggplot(SessionCountxREI, aes(x=sessioncount, 
+                                  y=Number_of_Students, 
+                                  color = ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") +
+      facet_wrap(~ethnicity, scales = "free") 
+
+master_data$ethnicity <- as.factor(master_data$ethnicity)
+levels(master_data$ethnicity)
+
+# aov(CCAPS_1 ~ ethnicity, master_data)
+```
+
+Presenting Problem by REI.
+
+```{r}
+PP1xREI <- master_data %>% 
+  group_by(ethnicity, PP_1) %>% 
+  summarize(Number_of_Students=length(clientid)) %>%
+  group_by(ethnicity) %>%
+  mutate(total = sum(Number_of_Students)) %>%
+  ungroup() %>%
+  mutate(Proportion=Number_of_Students/total)
+```
+
+```{r}
+ggplot(PP1xREI, aes(x=Number_of_Students, 
+                         y=PP_1, 
+                         group=ethnicity)) + 
+  geom_bar(stat="identity", position = "dodge") 
+```
+
+
+```{r,fig.width=7.5,fig.height=10}
+#PP1 by Ethnicity
+PP1_by_Ethnicity <- ggplot(PP1xREI, aes(x=Number_of_Students, 
+                                  y=PP_1, 
+                                  group=ethnicity,
+                                  color = ethnicity)) 
+
+PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") + 
+  theme_classic(base_size = 15) +
+  xlab("Number of Students") +
+  ylab("Primary Presenting Problem") + 
+  theme(legend.position = c(0.8, 0.1))
+
+```
+
+```{r,fig.width=10,fig.height=7.5}
+#PP1 by Ethnicity
+PP1_by_Ethnicity <- ggplot(PP1xREI, aes(y=Number_of_Students, 
+                                  x=PP_1, 
+                                  group=ethnicity,
+                                  color = ethnicity,
+                                  fill = ethnicity)) 
+PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") + 
+  theme_classic(base_size = 15) +
+  ylab("Number of Students") +
+  xlab("Primary Presenting Problem") + 
+  theme(legend.position = c(0.7, 0.6)) +
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+```{r,fig.width=6,fig.height=8}
+#PP1 by Ethnicity
+PP1_by_Ethnicity <- ggplot(PP1xREI, aes(y=Proportion, 
+                                  x=PP_1, 
+                                  group=ethnicity,
+                                  color = ethnicity,
+                                  fill = ethnicity)) 
+PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") + 
+  theme_classic(base_size = 15) +
+  ylab("Number of Students") +
+  xlab("Primary Presenting Problem") + 
+  theme(legend.position = c(0.7, 0.6)) +
+  theme(axis.text.x = element_text(angle = 60, hjust=1)) +
+   facet_wrap(~ethnicity, ncol = 2)
+```
+
+
+
+```{r StackedPPxEthnicity,fig.width=10,fig.height=7.5}
+#PP1 by Ethnicity
+PP1_by_Ethnicity <- ggplot(PP1xREI, aes(y=Proportion, 
+                                  x=PP_1, 
+                                  group=ethnicity,
+                                  color = ethnicity,
+                                  fill = ethnicity)) 
+PP1_by_Ethnicity + geom_bar(stat="identity", position = "stack") + 
+  theme_classic(base_size = 11) +
+  ylab("Percentage of Students") +
+  xlab("Primary Presenting Problem") + 
+  theme(legend.position = c(0.7, 0.6)) +
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+```{r}
+ggplot(PP1xREI, aes(x=Number_of_Students, 
+                                  y=PP_1, 
+                                  color = ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") +
+      facet_wrap(~ethnicity, scales = "free") 
+```
+
+CCAP trends by REI.
+
+```{r}
+#create tables for subscales and REI
+
+depressionxREI <- master_data %>% 
+  group_by((depression_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+generalized_anxietyxREI <- master_data %>% 
+  group_by((generalized_anxiety_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+social_anxietyxREI <- master_data %>% 
+  group_by((social_anxiety_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+academic_distressxREI <- master_data %>% 
+  group_by((academic_distress_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+eating_concernsxREI <- master_data %>% 
+  group_by((eating_concerns_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+family_distressxREI <- master_data %>% 
+  group_by((family_distress_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+hostilityxREI <- master_data %>% 
+  group_by((hostility_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+substance_usexREI <- master_data %>% 
+  group_by((substance_use_subscale), ethnicity) %>% 
+  summarize(Number_of_Students=length(clientid))
+
+#make simple histograms for subscales + REI
+
+ggplot(depressionxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(generalized_anxietyxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(depressionxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(generalized_anxietyxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+```
+
+2.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
+
+```{r}
+# Prepare chi-square data
+
+Diversity <- data.frame(outcome = c("Multiracial","Asian","Latinx","White","Black","Missing"),
+                        O = c(5.0,9.0,14.0,20.0,21.0,31.0),
+                        E = c(13.9,15.2,16.8,21.8,13.0,19.3))
+
+knitr::kable(Diversity)
+
+Diversity <- Diversity %>%
+  mutate(d = O -E) %>%
+  mutate(d_sq = d^2) %>%
+  mutate(div = d_sq/E)
+
+knitr::kable(Diversity)
+
+# Compute chi-square
+
+sum(Diversity$div)
+
+O <- c(5.0,9.0,14.0,20.0,21.0,31.0)
+E <- c(13.9,15.2,16.8,21.8,13.0,19.3)
+sum(((O-E)^2)/E)
+
+chisq.test(x=c(5.0,9.0,14.0,20.0,21.0,31.0))
+```
+
+Report basic demographics: REI, gender, # of credits
+
+```{r}
+# summary(master_data)
+
+# sapply(master_data$ethnicity, table)
+```
+
+```{r}
+# if(!require(devtools)) install.packages("devtools")
+# devtools::install_github("kassambara/ggpubr")
+# my_t_data <- read.csv(file.choose(BC_PCP_Ethnicity))
+
+
+```
+

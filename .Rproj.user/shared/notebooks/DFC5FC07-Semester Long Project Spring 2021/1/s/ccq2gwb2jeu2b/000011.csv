@@ -1,0 +1,8 @@
+"0","# gives me the total sum of sessions by each REI
+aggregate (master_data$sessioncount, by=list(master_data$ethnicity),FUN=sum)
+"
+"2","Warning in `[<-.data.frame`(`*tmp*`, is_list, value = list(`2` = ""<>"")) :"
+"2","
+ "
+"2"," replacement element 1 has 1 row to replace 0 rows
+"

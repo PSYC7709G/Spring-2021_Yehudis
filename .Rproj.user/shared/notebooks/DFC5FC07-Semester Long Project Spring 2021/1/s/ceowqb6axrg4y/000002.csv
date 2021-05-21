@@ -1,0 +1,7 @@
+"0","#assign a decoded column"
+"0",""
+"0","master_data$ethnicity <- factor(master_data$ethnicity, 1:7, ethnicity_code)"
+"0",""
+"0","master_data$gender <- factor(master_data$gender, 1:4, gender_code)"
+"0",""
+"0","master_data$PP_1 <- factor(master_data$PP1, 1:72, PP_code)"

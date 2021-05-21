@@ -1,0 +1,5 @@
+"0","# We need to reverse the score in some of the CCAPS-62 items. They are select positive items in a generally negative scale."
+"0","## reverse score in original column"
+"0",""
+"0","master_data[,c(""CCAPS_06"",""CCAPS_07"",""CCAPS_15"",""CCAPS_19"",""CCAPS_21"",""CCAPS_28"",""CCAPS_35"",""CCAPS_54"",""CCAPS_55"")] <- 4-master_data[,c(""CCAPS_06"",""CCAPS_07"",""CCAPS_15"",""CCAPS_19"",""CCAPS_21"",""CCAPS_28"",""CCAPS_35"",""CCAPS_54"",""CCAPS_55"")]"
+"0",""
