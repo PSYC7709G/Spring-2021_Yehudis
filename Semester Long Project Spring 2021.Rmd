@@ -1,5 +1,5 @@
 ---
-title: "Data to Remember"
+title: "How to Clean and Analyze Your Data"
 author: "Yehudis"
 date: "05/21/2021"
 output: html_document
@@ -38,7 +38,7 @@ The primary categorical variables that need decoding are ethnicity, gender, and 
 # Decode numerical string variables
 ## Create a decoder dictionary
 
-ethnicity_code <- c("African American/Black","Anglo American/White","Asian American/Pacific Islander","Hispanic American/Latino","Native American","More than 1 Ethnicity","No Response")
+ethnicity_code <- c("Black","White","Asian","Latinx","Native American","Multiracial","No Response")
 
 gender_code <- c("Missing/Unknown","Male","Female","Other")
 
@@ -334,15 +334,13 @@ We are left with 809 participants.
 
 Now that we have cleaned our data, it's ready to be analyzed!
 
-We will go through our questions (hypotheses; relaxed language used considering we are analyzing pre-existing datas) one by one.
+We will go through our questions (hypotheses; relaxed language used considering we are analyzing pre-existing data) one by one.
 
 1.	What is the mean number of sessions attended? 
 
 - Does this metric vary by racial or ethnic identity?
 
 - Report # of sessions but use different bars to represent REI
-
-3.	Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? Is there a disparity between the 8 CCAPS subscale scores among the different racial and/or ethnolinguistic communities?
 
 ```{r}
 
@@ -386,9 +384,11 @@ levels(master_data$ethnicity)
 # aov(CCAPS_1 ~ ethnicity, master_data)
 ```
 
-Presenting Problem by REI.
+We now want to find out which Presenting Problems were most used among the clients. Then we want to see how the distribution varies by REI.
 
 ```{r}
+# Create frequency table for Presenting Problem by REI.
+
 PP1xREI <- master_data %>% 
   group_by(ethnicity, PP_1) %>% 
   summarize(Number_of_Students=length(clientid)) %>%
@@ -398,16 +398,11 @@ PP1xREI <- master_data %>%
   mutate(Proportion=Number_of_Students/total)
 ```
 
-```{r}
-ggplot(PP1xREI, aes(x=Number_of_Students, 
-                         y=PP_1, 
-                         group=ethnicity)) + 
-  geom_bar(stat="identity", position = "dodge") 
-```
-
+We now experiment with a couple of visuals (histograms) to see which style will best tell the story. With 72 PP variables sorted among 5 ethnic/racial groups, it can get a bit crowded.
 
 ```{r,fig.width=7.5,fig.height=10}
 #PP1 by Ethnicity
+
 PP1_by_Ethnicity <- ggplot(PP1xREI, aes(x=Number_of_Students, 
                                   y=PP_1, 
                                   group=ethnicity,
@@ -420,6 +415,7 @@ PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") +
   theme(legend.position = c(0.8, 0.1))
 
 ```
+Take 2. 
 
 ```{r,fig.width=10,fig.height=7.5}
 #PP1 by Ethnicity
@@ -428,6 +424,7 @@ PP1_by_Ethnicity <- ggplot(PP1xREI, aes(y=Number_of_Students,
                                   group=ethnicity,
                                   color = ethnicity,
                                   fill = ethnicity)) 
+
 PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") + 
   theme_classic(base_size = 15) +
   ylab("Number of Students") +
@@ -435,6 +432,7 @@ PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") +
   theme(legend.position = c(0.7, 0.6)) +
   theme(axis.text.x = element_text(angle = 60, hjust=1))
 ```
+Still too hard to see! Take 3. 
 
 ```{r,fig.width=6,fig.height=8}
 #PP1 by Ethnicity
@@ -452,7 +450,7 @@ PP1_by_Ethnicity + geom_bar(stat="identity", position = "dodge") +
    facet_wrap(~ethnicity, ncol = 2)
 ```
 
-
+That works if we want to look at REI distibution separately. Let's try stacking for minimalist effect.
 
 ```{r StackedPPxEthnicity,fig.width=10,fig.height=7.5}
 #PP1 by Ethnicity
@@ -468,19 +466,54 @@ PP1_by_Ethnicity + geom_bar(stat="identity", position = "stack") +
   theme(legend.position = c(0.7, 0.6)) +
   theme(axis.text.x = element_text(angle = 60, hjust=1))
 ```
+Anxiety was the top concern, followed by depression. Runners up (in order) are stress management, relationship with family, and no response. Honorable mentions are academic workload, breakup/loss of a relationship, and just feeling generally overwhelmed.
+
+-- 
+
+2.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
+
+We need to measure the percentage breakdown of our sample REI against the percentage distribution in the college. A significant chi-square result would indicate that students are not receiving/seeking out services in the same proportion as their college attendance.
 
 ```{r}
-ggplot(PP1xREI, aes(x=Number_of_Students, 
-                                  y=PP_1, 
-                                  color = ethnicity)) + 
-      geom_bar(stat="identity", position = "dodge") +
-      facet_wrap(~ethnicity, scales = "free") 
+# Prepare chi-square data
+
+Diversity <- data.frame(outcome = c("Multiracial","Asian","Latinx","White","Black","Missing"),
+                        O = c(5.0,9.0,14.0,20.0,21.0,31.0),
+                        E = c(13.9,15.2,16.8,21.8,13.0,19.3))
+
+knitr::kable(Diversity)
+
+Diversity <- Diversity %>%
+  mutate(d = O -E) %>%
+  mutate(d_sq = d^2) %>%
+  mutate(div = d_sq/E)
+
+knitr::kable(Diversity)
+
+# Compute chi-square
+
+sum(Diversity$div)
+
+O <- c(5.0,9.0,14.0,20.0,21.0,31.0)
+E <- c(13.9,15.2,16.8,21.8,13.0,19.3)
+sum(((O-E)^2)/E)
+
+chisq.test(x=c(5.0,9.0,14.0,20.0,21.0,31.0))
 ```
+As we can see, our chi-square goodness of fit test resulted in a very small p-value of 0.00008016. From this we conclude that there is a substantial disparity between the REI representation at the college and the REI representation at the counseling center.
 
-CCAP trends by REI.
+--
+
+3.	Pathology x racial and ethnolinguistic idenntity
+
+- Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? 
+
+- Is there a disparity between the 8 CCAPS sub-scale scores among the different racial and/or ethnolinguistic communities?
+
+To examine this question, we first need to create frequency tables which correspond to each of the toal and sub-scales we will be analyzing. Histograms will help us visualize mean differences between groups.
 
 ```{r}
-#create tables for subscales and REI
+# Create tables for sub-scales and REI
 
 depressionxREI <- master_data %>% 
   group_by((depression_subscale), ethnicity) %>% 
@@ -514,7 +547,7 @@ substance_usexREI <- master_data %>%
   group_by((substance_use_subscale), ethnicity) %>% 
   summarize(Number_of_Students=length(clientid))
 
-#make simple histograms for subscales + REI
+# Make simple histograms for subscales + REI
 
 ggplot(depressionxREI, aes(x=Number_of_Students, 
                                   y=ethnicity)) + 
@@ -524,44 +557,102 @@ ggplot(generalized_anxietyxREI, aes(x=Number_of_Students,
                                   y=ethnicity)) + 
       geom_bar(stat="identity", position = "dodge") 
 
-ggplot(depressionxREI, aes(x=Number_of_Students, 
+ggplot(social_anxietyxREI, aes(x=Number_of_Students, 
                                   y=ethnicity)) + 
       geom_bar(stat="identity", position = "dodge") 
 
-ggplot(generalized_anxietyxREI, aes(x=Number_of_Students, 
+ggplot(academic_distressxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(eating_concernsxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(family_distressxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(hostilityxREI, aes(x=Number_of_Students, 
+                                  y=ethnicity)) + 
+      geom_bar(stat="identity", position = "dodge") 
+
+ggplot(substance_usexREI, aes(x=Number_of_Students, 
                                   y=ethnicity)) + 
       geom_bar(stat="identity", position = "dodge") 
 ```
-
-2.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
-
 ```{r}
-# Prepare chi-square data
+# Ensure ethnicity is properly sorted into levels that can then be used for analyzing.
 
-Diversity <- data.frame(outcome = c("Multiracial","Asian","Latinx","White","Black","Missing"),
-                        O = c(5.0,9.0,14.0,20.0,21.0,31.0),
-                        E = c(13.9,15.2,16.8,21.8,13.0,19.3))
+levels(master_data$ethnicity)
 
-knitr::kable(Diversity)
+master_data$ethnicity <- ordered(master_data$ethnicity,
+                                 levels = c("Black","White","Asian","Latinx","Multiracial"))
 
-Diversity <- Diversity %>%
-  mutate(d = O -E) %>%
-  mutate(d_sq = d^2) %>%
-  mutate(div = d_sq/E)
+library(dplyr)
 
-knitr::kable(Diversity)
+# Descriptive Statistics - Total Pathology Score by REI
 
-# Compute chi-square
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(CCAPS_score, na.rm = TRUE),
+    sd = sd(CCAPS_score, na.rm = TRUE),
+    range = range(CCAPS_score, na.rm = TRUE),
+  )
 
-sum(Diversity$div)
+library(ggpubr)
 
-O <- c(5.0,9.0,14.0,20.0,21.0,31.0)
-E <- c(13.9,15.2,16.8,21.8,13.0,19.3)
-sum(((O-E)^2)/E)
+# Box plot - Total Pathology Score by REI
 
-chisq.test(x=c(5.0,9.0,14.0,20.0,21.0,31.0))
+ggboxplot(master_data, x = "ethnicity", y = "CCAPS_score", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Total CCAPS Score", xlab = "Racial and Ethnolinguistic Identity")
+
+# The following plot shows more of the data directly. Too much, perhaps.
+
+ggline(master_data, x = "ethnicity", y = "CCAPS_score",
+       add = c("mean_se", "jitter"), 
+       order = c("Black","White","Asian","Latinx","Multiracial"),
+        ylab = "Total CCAPS Score", xlab = "Racial and Ethnolinguistic Identity")
 ```
+```{r}
+# Descriptive Statistics - Depression Sub-Scale Score by REI
 
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(depression_subscale, na.rm = TRUE),
+    sd = sd(depression_subscale, na.rm = TRUE),
+    range = range(depression_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Depression Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "depression_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Depression", xlab = "Racial and Ethnolinguistic Identity")
+```
+```{r}
+# Descriptive Statistics - Generalized Anxiety Sub-Scale Score by REI
+
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(generalized_anxiety_subscale, na.rm = TRUE),
+    sd = sd(generalized_anxiety_subscale, na.rm = TRUE),
+    range = range(generalized_anxiety_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Generalized Anxiety Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "generalized_anxiety_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Generalized Anxiety", xlab = "Racial and Ethnolinguistic Identity")
+```
 Report basic demographics: REI, gender, # of credits
 
 ```{r}
@@ -569,12 +660,3 @@ Report basic demographics: REI, gender, # of credits
 
 # sapply(master_data$ethnicity, table)
 ```
-
-```{r}
-# if(!require(devtools)) install.packages("devtools")
-# devtools::install_github("kassambara/ggpubr")
-# my_t_data <- read.csv(file.choose(BC_PCP_Ethnicity))
-
-
-```
-
