@@ -40,7 +40,7 @@ The primary categorical variables that need decoding are ethnicity, gender, and 
 
 ethnicity_code <- c("Black","White","Asian","Latinx","Native American","Multiracial","No Response")
 
-gender_code <- c("Missing/Unknown","Male","Female","Other")
+gender_code <- c("Male","Female","Missing/Unknown","Other")
 
 PP_code <- c("Academic workload",
 "Adjusting to university",
@@ -581,6 +581,8 @@ ggplot(substance_usexREI, aes(x=Number_of_Students,
                                   y=ethnicity)) + 
       geom_bar(stat="identity", position = "dodge") 
 ```
+Each 
+
 ```{r}
 # Ensure ethnicity is properly sorted into levels that can then be used for analyzing.
 
@@ -653,10 +655,130 @@ ggboxplot(master_data, x = "ethnicity", y = "generalized_anxiety_subscale",
           order = c("Black","White","Asian","Latinx","Multiracial"),
           ylab = "Generalized Anxiety", xlab = "Racial and Ethnolinguistic Identity")
 ```
-Report basic demographics: REI, gender, # of credits
+```{r}
+# Descriptive Statistics - Social Anxiety Sub-Scale Score by REI
+
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(social_anxiety_subscale, na.rm = TRUE),
+    sd = sd(social_anxiety_subscale, na.rm = TRUE),
+    range = range(social_anxiety_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Social Anxiety Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "social_anxiety_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Social Anxiety", xlab = "Racial and Ethnolinguistic Identity")
+```
 
 ```{r}
-# summary(master_data)
+# Descriptive Statistics - Academic Distress Sub-Scale Score by REI
 
-# sapply(master_data$ethnicity, table)
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(academic_distress_subscale, na.rm = TRUE),
+    sd = sd(academic_distress_subscale, na.rm = TRUE),
+    range = range(academic_distress_subscale, na.rm = TRUE),
+  )
+
+# Box plot -Academic Distress Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "academic_distress_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Academic Distress", xlab = "Racial and Ethnolinguistic Identity")
+
+```
+
+```{r}
+# Descriptive Statistics - Eating Concerns Sub-Scale Score by REI
+
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(eating_concerns_subscale, na.rm = TRUE),
+    sd = sd(eating_concerns_subscale, na.rm = TRUE),
+    range = range(eating_concerns_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Eating Concerns Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "eating_concerns_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Eating Concerns", xlab = "Racial and Ethnolinguistic Identity")
+
+```
+The dots above the box plots signify extreme scores (possible outliers). We checked the frequency  table which confirms a few high scores way above the group means.
+
+```{r}
+# Descriptive Statistics - Family Distress Sub-Scale Score by REI
+
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(family_distress_subscale, na.rm = TRUE),
+    sd = sd(family_distress_subscale, na.rm = TRUE),
+    range = range(family_distress_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Family Distress Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "family_distress_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Family Distress", xlab = "Racial and Ethnolinguistic Identity")
+
+```
+
+```{r}
+# Descriptive Statistics - Hostility Sub-Scale Score by REI
+
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(hostility_subscale, na.rm = TRUE),
+    sd = sd(hostility_subscale, na.rm = TRUE),
+    range = range(hostility_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Hostility Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "hostility_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Hostility", xlab = "Racial and Ethnolinguistic Identity")
+
+```
+
+```{r}
+# Descriptive Statistics - Substance Use Sub-Scale Score by REI
+
+group_by(master_data, ethnicity) %>%
+  summarise(
+    count = n(),
+    mean = mean(substance_use_subscale, na.rm = TRUE),
+    sd = sd(substance_use_subscale, na.rm = TRUE),
+    range = range(substance_use_subscale, na.rm = TRUE),
+  )
+
+# Box plot - Substance Use Sub-Scale Score by REI
+
+ggboxplot(master_data, x = "ethnicity", y = "substance_use_subscale", 
+          color = "ethnicity", 
+          order = c("Black","White","Asian","Latinx","Multiracial"),
+          ylab = "Substance Use", xlab = "Racial and Ethnolinguistic Identity")
+
+```
+The dots here tell us there is extreme variability in the distribution within groups. 
+
+Report basic demographics: REI, gender, # of credits
+
+General summary of means and range for all variables:
+```{r}
+summary(master_data)
 ```
