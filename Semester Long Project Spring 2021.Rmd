@@ -9,15 +9,81 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, fig.path = "figures/", dev = c("pdf", "png"))
 ```
 
+Concept:
+
+Everyone uses R for different reasons, even in statistics. Personally, I like to perform most statistical analyses in SPSS, but utilize the freedom of R to clean my data and create pretty graphs, which is where software like SPSS is weaker.
+
+We want to be able to input a dirty data file and give it a nice bath. First things first, make sure your file is in .csv format for prime readability. There are many ways to read a file, but I use readr. Then create a vector to rename the data set.
+
+```{r}
+# install.packages("readr")
+# library(readr)
+# data <- read_csv("example_file.csv")
+```
+
+Next, we come to the parts that vary depending on your data and hypotheses. What information do you need from your data? Look at your hypotheses. If there are columns upon columns of information you won't be using for your analysis, remove them, because otherwise they would only muddle your process.
+
+Then, we need to add a dictionary to some of our variables, just like we would have a code book on our SPSS file. When entering our data, sometimes a number stands in place for certain string variables. To understand what those numbers mean, decoding them into their true meaning is an important step in data cleaning.
+
+I label the vectors in which I decode the columns I need to decode, by their name + underscore + code. Make sure the items in the vector match up to the order of the numbers, because the first one will be assigned to the lowest number, etc.
+
+```{r}
+# example_code <- c("One","Two","Three","Four")
+```
+
+Now that we have the items to which our data corresponds to, we need to make sure the items in our data file are changed to their proper string variables. So we assign the decoded vector to its appropriate column.
+
+```{r}
+# data$example <- factor(data$example, 1:4, example_code)
+```
+
+Another way to decode is by decoding the title of a column instead of the data in the columnns themselves. This may be useful in something like a questionnaire with 100 items that are labeled in your data as "1, 2, 3" etc. but each item is a specific question that is relevant to analysis.
+
+```{r}
+# example	= "Random question?"
+```
+
+If our items were responded to on something like a Likert scale with numbered answers (eg. 0 = least, 4 = most), it's possible that some things are scored to wrong way. It might be that way when positive items appear on a negative scale or vice versa. There are multiple ways to reverse scores, but we are looking for a way that won't neccessitate a new column and then make us delete the original one (too messy = too much room to slip up. Yikes!)
+
+In this case, the 4- indicates that the score goes up to 4 and we want to reverse the scores of the indicated items.
+
+```{r}
+# data[,c("example_1", "example_2", "example_3")] <- 4-master_data[,c("example_1", "example_2", "example_3")]
+```
+
+If indeed our data includes a questionnaire with 100 items, it's highly possible that in order to analyze, we need to sum up our 100 items for each participant. If so, we create a new vector which creates a new column in our data file, which we name appropriately the example_1 and example_100 indicate to include items 1 to 100 on the questionnaire in our sum. Na.rm = TRUE tells us to include participants who didn't answer all questions. 
+
+```{r}
+# data$example_score <- rowSums(master_data[grep("example_1", colnames(master_data)):grep("example_100", colnames(master_data))],na.rm = TRUE)
+```
+
+It's possible that we've come this far and then realized that some participants don't fit in with our hypotheses and need to be removed. Perhaps they didn't answer an important question, or were in the wrong age group, or are an extreme outlier. Regardless, they have to go.
+
+```{r}
+# data <- data[data$example != "Unmet Criteria",]
+# 
+# # We reform the factor to account for the removed subjects.
+# 
+# data$example <- factor(data$example)
+```
+
+Now, our data is ready to analyze! Of course, you may need to do some things that we haven't done here. Make sure YOU and YOUR data are ready.
+
+--
+
+Practical:
+
 Between 2016 and 2018, we have collected data from 1,206 clients who utilized the counseling center at an urban college in a larger university system, for at least one session. We recorded demographic information as provided by the SDS, the number of sessions attended, and their pathology levels on a clinical intake form (the CCAPS-62). 
 
 The study analyzed pre-existing clinical data related to the following questions:
 
 1.	What is the mean number of sessions attended? Does this metric vary by racial or ethnic identity?
 
-2.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
+2. Which Presenting Problems were most used among the clients? How does the distribution vary by REI?
 
-3.	Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? Is there a disparity between the 8 CCAPS subscale scores among the different racial and/or ethnolinguistic communities?
+3.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
+
+4.	Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? Is there a disparity between the 8 CCAPS subscale scores among the different racial and/or ethnolinguistic communities?
 
 - Before uploading our original data set to R, we removed the data from 26 clients who did not complete the CCAPS-62 questionnaire. This left us with a starting point of 1,180 clients (originally 1,206).
 
@@ -384,7 +450,7 @@ levels(master_data$ethnicity)
 # aov(CCAPS_1 ~ ethnicity, master_data)
 ```
 
-We now want to find out which Presenting Problems were most used among the clients. Then we want to see how the distribution varies by REI.
+2. Which Presenting Problems were most used among the clients? How does the distribution vary by REI?
 
 ```{r}
 # Create frequency table for Presenting Problem by REI.
@@ -470,7 +536,7 @@ Anxiety was the top concern, followed by depression. Runners up (in order) are s
 
 -- 
 
-2.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
+3.	Is there a disparity between a racial and/or ethnolinguistic community’s population in the college and their counseling utilization rate?
 
 We need to measure the percentage breakdown of our sample REI against the percentage distribution in the college. A significant chi-square result would indicate that students are not receiving/seeking out services in the same proportion as their college attendance.
 
@@ -504,7 +570,7 @@ As we can see, our chi-square goodness of fit test resulted in a very small p-va
 
 --
 
-3.	Pathology x racial and ethnolinguistic idenntity
+4.	Pathology x racial and ethnolinguistic identity
 
 - Is there a disparity between the total CCAPS score among the different racial and/or ethnolinguistic communities? 
 
@@ -782,3 +848,26 @@ General summary of means and range for all variables:
 ```{r}
 summary(master_data)
 ```
+Generalization Problem:
+
+1. It is your turn to analyze a data set. Find a set used in a paper on an open science website, and copy down the authors' hypotheses. Alternatively, use your own data, collected from any survey.
+
+- Write down clearly what the hypotheses are. It's okay if there is just one. 
+
+- Use your data cleaning skills to remove any columns and rows that won't be used in the final statistical analysis.
+
+- Decode any variables that are string represented by a number. Including column names and column variables. 
+
+- Reverse score anything which is scored backwards.
+
+- Create any additional score or mean columns etc. which may be needed.
+
+- Check against your hypotheses to make sure that only data you need will be used. Make sure everything is coded correctly.
+
+Bonus: Analysis
+
+- Find basic means, SDs, ranges, etc. of your variables. Make a chart which cleanly explains your results. Play around with sizing, colors, labels, etc. The point is to derive basic statistics and make the results look aesthetic without necessarily conducting statistical tests.
+
+Solution:
+
+Follow the Practical section step by step but replace with your own data. 
